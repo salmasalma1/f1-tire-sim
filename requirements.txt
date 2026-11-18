@@ -1,0 +1,15 @@
+# Packages imported by tire_sim.ipynb.
+# Versions are NOT verified unless noted: the notebook ran in Google Colab (Python 3.12).
+kagglehub
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+statsmodels
+scikit-learn
+imbalanced-learn
+xgboost
+scikit-fuzzy==0.5.0   # version shown in the notebook's install output
+gradio==5.50.0        # version shown in the notebook's install output
+pyarrow               # not imported directly; needed by pandas.read_parquet
