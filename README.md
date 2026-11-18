@@ -30,6 +30,89 @@ Exploratory analysis and machine-learning models for Formula 1 tyre status, buil
 
 The dataset is **not included** in this repository. See [`data/README.md`](data/README.md) for how to download it and where to check its terms of use.
 
+## Exploratory data analysis
+
+All numbers and figures below are the outputs saved in the notebook.
+
+### Dataset at a glance
+
+| Item | Value |
+|---|---|
+| Rows (laps) | 69,230 |
+| Columns | 30 raw (37 after cleaning and outlier flags) |
+| Seasons | 3 (from 2021) |
+| Races / circuits | 64 races on 27 circuits |
+| Drivers / constructors | 29 drivers, 10 constructors |
+| Missing values | The data-info output shows 553 missing `TyreLife` and 75 missing `position_y` values. The cleaning cell's saved output reports 0 missing values and drops no rows, so these two outputs come from different runs. |
+
+### Target balance (`tire_status`)
+
+| Class | Share before SMOTE | Share after SMOTE |
+|---|---|---|
+| marginal | 51.25 % | 33.33 % |
+| optimal | 46.34 % | 33.33 % |
+| critical | 2.40 % | 33.33 % |
+
+`critical` is rare, so SMOTE is used to balance the classes. After SMOTE the split gives 85,159 training rows and 21,290 test rows.
+
+### Tyre compounds
+
+| Compound | Laps |
+|---|---|
+| hard | 29,668 |
+| medium | 24,965 |
+| soft | 9,869 |
+| intermediate | 3,886 |
+| wet | 454 |
+| none | 368 |
+| unknown | 20 |
+
+### Distributions
+
+| Feature | Skewness | Kurtosis |
+|---|---|---|
+| tyrelife | 0.898 | 0.551 |
+| stint | 0.895 | 0.896 |
+| airtemp | -0.116 | 0.145 |
+| tracktemp | 0.051 | -0.350 |
+| humidity | -0.142 | -0.122 |
+| pressure | -2.641 | 6.651 |
+| windspeed | 1.449 | 1.939 |
+
+- Tyre life and stint are right-skewed: most laps come early in a tyre's life, with a long tail of long stints.
+- Air pressure is strongly left-skewed with heavy tails.
+- The temperatures and humidity are close to symmetric.
+
+![Distribution of tyre life](docs/images/tyrelife_distribution.png)
+
+*Distribution of `tyrelife` (laps on the current tyre; x axis = tyre life, y axis = number of laps).*
+
+### Correlations
+
+![Correlation matrix of the numeric features](docs/images/correlation_heatmap.png)
+
+*Pearson correlations. Rows and columns, in order: tyrelife, stint, airtemp, tracktemp, humidity, pressure, windspeed.*
+
+- **Air and track temperature:** they move together (0.64), and humidity falls as track temperature rises (-0.57).
+- **Other weather pairs:** humidity and pressure 0.38, track temperature and pressure -0.34, air temperature and humidity -0.39.
+- **Tyre life and weather:** tyre life is almost uncorrelated with the weather features (|r| ≤ 0.07) and with stint number (0.01).
+
+### Multicollinearity (VIF)
+
+| Feature | VIF |
+|---|---|
+| tyrelife | 3.13 |
+| stint | 5.43 |
+| airtemp | 51.52 |
+| tracktemp | 34.39 |
+| humidity | 17.19 |
+| pressure | 76.20 |
+| windspeed | 2.77 |
+
+The VIF values were computed on the unscaled features without an intercept term. The very high values for pressure and the temperatures partly reflect that, not only true collinearity.
+
+> **Note on the figures:** the notebook sets plot text to white, but the saved figures have a white background, so their axis labels and tick values are not visible. The captions above give the axes. Re-running the notebook with a dark figure background (`plt.rcParams['figure.facecolor']`) would show them.
+
 ## Setup
 
 The notebook was developed in Google Colab (Python 3.12). To run it locally:
